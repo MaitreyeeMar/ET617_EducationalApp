@@ -70,7 +70,7 @@ The threshold must NOT be buried in the model inference code.
 - [ ] Add `AksharaRowView` to `fragment_speaking.xml`
 - [ ] Observe `SpeakingViewModel.uiState` in `SpeakingFragment`, call `aksharaRow.setStates()`
 - [ ] Merge `colors_aksharvel.xml` into `res/values/colors.xml`
-- [ ] Wire `SpeakingViewModel` factory with the real `SpeechScorer` implementation once Yugratna's APK test is done
+- [ ] Wire `SpeakingViewModel` factory with the real `SpeechScorer` implementation once APK test is done
 - [ ] Run `validate_gop.py` against adult-baseline recordings and update `CORRECT_THRESHOLD` if the suggested value differs by more than 0.1
 
 ---
