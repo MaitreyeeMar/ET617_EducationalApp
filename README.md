@@ -1,20 +1,16 @@
 # Speaking Mode — Phoneme Feedback Module
 
-**Author:** Vedika Borse  
-**Thread:** Speaking Mode (बोला) — visual feedback layer  
-**Meeting ref:** MoM 04 · 02/09/2026
-
 ---
 
 ## What this module does
 
-This folder bridges Yugratna's ASR pipeline (`PronunciationChecker.kt` / `SpeechScorer`) and
+This folder bridges ASR pipeline (`PronunciationChecker.kt` / `SpeechScorer`) and
 the child-facing screen. It takes the per-akshara GOP scores the scorer produces and maps them
 to the green / amber / grey colour row the child sees.
 
 ```
 PronunciationChecker.kt  →  SpeechScorer.Result
-        (Yugratna)                    │
+                                      │
                                       ▼
                            PhonemeHighlighter.kt     ← this module
                                       │
@@ -35,7 +31,7 @@ PronunciationChecker.kt  →  SpeechScorer.Result
 | `PhonemeHighlighter.kt` | Maps `SpeechScorer.Result` → `List<AksharaState>`. Owns the GOP threshold and the aural hint string. |
 | `AksharaState.kt` | *(defined inside PhonemeHighlighter.kt)* Data class holding one akshara's display state and raw GOP score. |
 | `AksharaRowView.kt` | Custom `View` that draws the phoneme chip row with animation on the FOCUS chip. |
-| `SpeakingViewModel.kt` | ViewModel for the Speaking Mode screen. Orchestrates record → score → highlight → persist. Talks to Yugratna's `SpeechScorer` and Maitreyee's `AksharvelDao`. |
+| `SpeakingViewModel.kt` | ViewModel for the Speaking Mode screen. Orchestrates record → score → highlight → persist. Talks to `SpeechScorer` and `AksharvelDao`. |
 | `validate_gop.py` | Calibration harness for `CORRECT_THRESHOLD`. Run against labelled recordings to verify the threshold is data-driven, not guessed. Mirrors the role of `stroke_validate.py`. |
 | `colors_aksharvel.xml` | Android colour resources for the chip states. Merge into `res/values/colors.xml`. |
 
