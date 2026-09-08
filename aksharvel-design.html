@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aksharvel — screen design &amp; mode functionality</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Rubik:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mud:#33150C;          /* board ground */
+  --mud-2:#421D11;
+  --geru:#8A3417;         /* the wall: app background */
+  --geru-lo:#6E2911;
+  --rice:#F4EBD9;         /* rice-paste white: figures, letters */
+  --rice-dim:rgba(244,235,217,.52);
+  --haldi:#E9A72C;        /* turmeric: reward, correct */
+  --teal:#1F5A5E;         /* chrome, secondary action */
+  --alert:#D3452F;
+  --dev:"Baloo 2","Noto Sans Devanagari",system-ui,sans-serif;
+  --ui:"Rubik",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--mud);color:var(--rice);font-family:var(--ui);
+  line-height:1.55;
+  background-image:radial-gradient(circle at 12% 8%,rgba(233,167,44,.07),transparent 45%),
+                   radial-gradient(circle at 88% 72%,rgba(31,90,94,.12),transparent 40%);
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--haldi)}
+h1,h2,h3{margin:0;font-weight:600}
+p{margin:0}
+
+/* ---------- masthead ---------- */
+header.top{padding:64px 0 40px;border-bottom:1px solid rgba(244,235,217,.14)}
+.top-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+.glyph-hero{
+  font-family:var(--dev);font-size:clamp(90px,15vw,190px);line-height:.82;
+  color:var(--rice);letter-spacing:-.02em;
+}
+.glyph-hero span{color:var(--haldi)}
+h1.title{font-family:var(--dev);font-size:44px;font-weight:800;letter-spacing:.01em;margin-top:6px}
+.sub{color:var(--rice-dim);font-size:15.5px;margin-top:12px;max-width:44ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid rgba(244,235,217,.3);border-radius:999px;padding:6px 11px;color:var(--rice)}
+.chip.on{background:var(--haldi);border-color:var(--haldi);color:#3A1B04}
+.dance{display:flex;align-items:flex-end;justify-content:center;gap:2px}
+.warli{width:46px;height:66px;fill:var(--rice);stroke:var(--rice);stroke-width:2.2;stroke-linecap:round}
+.warli.sm{width:30px;height:44px;stroke-width:2.8}
+.warli.dim{fill:rgba(244,235,217,.16);stroke:rgba(244,235,217,.2)}
+.dance .warli:nth-child(even){transform:translateY(-8px) rotate(-4deg)}
+.dance .warli:nth-child(odd){transform:rotate(3deg)}
+
+/* ---------- tokens ---------- */
+.tokens{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:rgba(244,235,217,.14);
+  border:1px solid rgba(244,235,217,.14);margin:34px 0 0}
+.tok{background:var(--mud);padding:14px 15px}
+.tok b{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--haldi);margin-bottom:8px}
+.sw{height:26px;border-radius:3px;margin-bottom:7px}
+.tok small{font-family:var(--mono);font-size:11px;color:var(--rice-dim)}
+
+section{padding:66px 0 10px}
+.sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+h2.sec{font-family:var(--dev);font-size:30px;font-weight:700}
+.sec-note{color:var(--rice-dim);font-size:14.5px;max-width:70ch;margin-bottom:34px}
+
+/* ---------- flow board ---------- */
+.board{display:flex;flex-wrap:wrap;gap:34px 30px;align-items:flex-start}
+.frame-unit{width:262px}
+.frame-tag{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.frame-no{font-family:var(--mono);font-size:11px;color:var(--haldi);border:1px solid var(--haldi);
+  width:22px;height:22px;display:grid;place-items:center;border-radius:50%;flex:none}
+.frame-name{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+.phone{width:262px;height:520px;border-radius:26px;background:var(--geru);border:8px solid #21100A;
+  box-shadow:0 18px 40px rgba(0,0,0,.45);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.phone::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(115deg,rgba(0,0,0,.05) 0 2px,transparent 2px 7px)}
+.scr{flex:1;display:flex;flex-direction:column;padding:16px 15px;position:relative;z-index:2}
+.scr-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,235,217,.62);margin-bottom:14px}
+.ask{font-family:var(--dev);font-size:20px;font-weight:700;text-align:center;line-height:1.25}
+.ask em{font-style:normal;color:var(--haldi)}
+.big-letter{font-family:var(--dev);font-weight:800;color:var(--rice);text-align:center;line-height:1}
+.card{background:var(--rice);color:#3A1B04;border-radius:14px;display:grid;place-items:center;
+  font-family:var(--dev);font-weight:700;box-shadow:0 4px 0 rgba(0,0,0,.28)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.pill{border-radius:999px;font-family:var(--dev);font-weight:700;font-size:16px;padding:12px;text-align:center;
+  background:var(--haldi);color:#3A1B04;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.pill.ghost{background:transparent;color:var(--rice);border:2px solid rgba(244,235,217,.5);box-shadow:none}
+.pill.teal{background:var(--teal);color:var(--rice)}
+.mic{width:84px;height:84px;border-radius:50%;background:var(--haldi);display:grid;place-items:center;margin:0 auto;
+  box-shadow:0 6px 0 rgba(0,0,0,.3)}
+.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:34px}
+.wave i{width:4px;border-radius:2px;background:var(--rice);display:block}
+.rowline{display:flex;align-items:center;gap:9px;background:rgba(0,0,0,.16);border-radius:10px;padding:9px 11px}
+.rowline b{font-family:var(--dev);font-size:13px;font-weight:600;flex:1}
+.play{width:26px;height:26px;border-radius:50%;background:var(--rice);display:grid;place-items:center;flex:none}
+.play svg{width:11px;height:11px;fill:#3A1B04}
+.trace-box{flex:1;border-radius:16px;border:2px dashed rgba(244,235,217,.4);display:grid;place-items:center;position:relative}
+.trace-box .ghost-letter{font-family:var(--dev);font-size:130px;font-weight:800;color:rgba(244,235,217,.2);line-height:1}
+.dot{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--haldi);color:#3A1B04;
+  font-family:var(--mono);font-size:11px;display:grid;place-items:center}
+.tarpa{position:relative;width:186px;height:186px;margin:6px auto}
+.tarpa .warli{position:absolute;left:50%;top:50%;margin:-22px 0 0 -15px}
+.tarpa .hub{position:absolute;inset:52px;border-radius:50%;border:2px solid rgba(244,235,217,.3);
+  display:grid;place-items:center;font-family:var(--dev);font-size:15px;font-weight:700;text-align:center;line-height:1.2}
+.annot{margin-top:11px;font-size:13px;color:var(--rice-dim)}
+.annot b{color:var(--rice);font-weight:500}
+.arrow{align-self:center;color:var(--haldi);font-size:26px;padding-top:150px;flex:none}
+
+/* ---------- prototype ---------- */
+.proto{display:grid;grid-template-columns:302px 1fr;gap:40px;align-items:start}
+.live{width:302px;height:596px;border-radius:30px;background:var(--geru);border:9px solid #21100A;
+  box-shadow:0 22px 50px rgba(0,0,0,.5);overflow:hidden;position:relative}
+.live .scr{height:100%;padding:18px 17px}
+.hide{display:none!important}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--haldi);outline-offset:3px}
+.tile{background:var(--rice);color:#3A1B04;border-radius:16px;font-family:var(--dev);font-size:40px;font-weight:700;
+  height:78px;box-shadow:0 5px 0 rgba(0,0,0,.28);transition:transform .12s,background .2s}
+.tile:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.tile.right{background:var(--haldi)}
+.tile.wrong{background:#C8BBA6;opacity:.5}
+#canvasWrap{position:relative;flex:1;border-radius:16px;border:2px dashed rgba(244,235,217,.4);overflow:hidden;touch-action:none}
+#traceCanvas,#ghostCanvas{position:absolute;inset:0;width:100%;height:100%}
+#ghostCanvas{pointer-events:none}
+.verdict{font-family:var(--dev);font-size:19px;font-weight:700;text-align:center}
+.metre{height:7px;border-radius:4px;background:rgba(0,0,0,.25);overflow:hidden;margin-top:6px}
+.metre i{display:block;height:100%;background:var(--haldi);width:0;transition:width .4s}
+.tabs{display:flex;gap:7px;margin-bottom:16px}
+.tabs button{font-family:var(--dev);font-size:14px;font-weight:600;padding:8px 12px;border-radius:999px;
+  border:1.5px solid rgba(244,235,217,.35)}
+.tabs button[aria-pressed="true"]{background:var(--rice);color:#3A1B04;border-color:var(--rice)}
+
+/* ---------- spec ---------- */
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.spec{border:1px solid rgba(244,235,217,.18);background:var(--mud-2);padding:22px 20px}
+.spec h3{font-family:var(--dev);font-size:23px;font-weight:700}
+.spec .tagline{color:var(--haldi);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:4px 0 14px}
+.spec dl{margin:0;display:grid;gap:11px}
+.spec dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--rice-dim)}
+.spec dd{margin:2px 0 0;font-size:14px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+.tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid rgba(244,235,217,.14);vertical-align:top}
+.tbl th{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--haldi);font-weight:500}
+.tbl td:first-child{font-family:var(--dev);font-weight:600;white-space:nowrap}
+.callout{border-left:3px solid var(--haldi);padding:14px 18px;background:rgba(233,167,44,.07);font-size:14.5px;margin-top:26px}
+footer{padding:70px 0 90px;color:var(--rice-dim);font-size:13px}
+@media (max-width:900px){
+  .top-grid{grid-template-columns:1fr}.dance{display:none}
+  .proto{grid-template-columns:1fr}.live{width:100%;max-width:302px}
+  .arrow{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap"><div class="top-grid">
+  <div>
+    <p class="eyebrow">Aksharvel · screen design v0.1 · offline Android</p>
+    <div class="glyph-hero">अ आ <span>क</span></div>
+    <h1 class="title">अक्षरवेल</h1>
+    <p class="sub">Marathi letters, sounds and strokes for Warli-speaking children in Palghar. Three modes, one screen at a time, zero network calls.</p>
+    <div class="chips">
+      <span class="chip on">100% offline</span>
+      <span class="chip on">No login</span>
+      <span class="chip">Grades 1–6</span>
+      <span class="chip">One-hand, thumb reach</span>
+      <span class="chip">Works at 480×854</span>
+    </div>
+  </div>
+  <div class="dance" aria-hidden="true">
+    <svg class="warli" viewBox="0 0 40 62"><circle cx="20" cy="8" r="6"/><path d="M20 30 L11 16 L29 16 Z"/><path d="M20 30 L12 44 L28 44 Z"/><path d="M11 18 L2 9"/><path d="M29 18 L38 9"/><path d="M15 44 L11 60"/><path d="M25 44 L29 60"/></svg>
+    <svg class="warli" viewBox="0 0 40 62"><circle cx="20" cy="8" r="6"/><path d="M20 30 L11 16 L29 16 Z"/><path d="M20 30 L12 44 L28 44 Z"/><path d="M11 18 L3 26"/><path d="M29 18 L37 26"/><path d="M15 44 L9 59"/><path d="M25 44 L31 59"/></svg>
+    <svg class="warli" viewBox="0 0 40 62"><circle cx="20" cy="8" r="6"/><path d="M20 30 L11 16 L29 16 Z"/><path d="M20 30 L12 44 L28 44 Z"/><path d="M11 18 L2 9"/><path d="M29 18 L38 9"/><path d="M15 44 L11 60"/><path d="M25 44 L29 60"/></svg>
+  </div>
+</div>
+
+<div class="tokens">
+  <div class="tok"><b>Wall</b><div class="sw" style="background:#8A3417"></div><small>#8A3417 geru</small></div>
+  <div class="tok"><b>Rice paste</b><div class="sw" style="background:#F4EBD9"></div><small>#F4EBD9 letters</small></div>
+  <div class="tok"><b>Turmeric</b><div class="sw" style="background:#E9A72C"></div><small>#E9A72C correct</small></div>
+  <div class="tok"><b>Teal</b><div class="sw" style="background:#1F5A5E"></div><small>#1F5A5E listen again</small></div>
+  <div class="tok"><b>Display</b><div style="font-family:var(--dev);font-size:30px;font-weight:800;line-height:1;margin-bottom:8px">क ख ग</div><small>Baloo 2, 800</small></div>
+  <div class="tok"><b>Touch target</b><div style="font-family:var(--dev);font-size:22px;font-weight:700;line-height:1.2;margin-bottom:8px">≥ 64dp</div><small>4 per screen max</small></div>
+</div>
+</div></header>
+
+<!-- ============ FLOW BOARD ============ -->
+<section><div class="wrap">
+  <div class="sec-head"><p class="eyebrow">01</p><h2 class="sec">Screen flow</h2></div>
+  <p class="sec-note">Eight frames, one loop. A child can reach any activity in two taps from cold start, and every screen has exactly one forward action. No text a Grade 1 child cannot read is load-bearing — instructions are spoken, labels are icons plus a single Marathi verb.</p>
+
+  <div class="board">
+
+    <!-- 01 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">1</span><span class="frame-name">Pick your mark</span></div>
+      <div class="phone"><div class="scr">
+        <div class="scr-top"><span>अक्षरवेल</span><span>◑ 62%</span></div>
+        <p class="ask">तुझं चिन्ह निवड</p>
+        <div class="grid2" style="margin-top:16px;gap:12px">
+          <div class="card" style="height:74px;font-size:34px">🐟</div>
+          <div class="card" style="height:74px;font-size:34px">🌙</div>
+          <div class="card" style="height:74px;font-size:34px">🪶</div>
+          <div class="card" style="height:74px;font-size:34px">🌳</div>
+          <div class="card" style="height:74px;font-size:34px">🐘</div>
+          <div class="card" style="height:74px;font-size:34px">🥁</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="pill ghost" style="font-size:14px">नवीन चिन्ह</div>
+      </div></div>
+      <p class="annot"><b>Replaces login.</b> Up to 12 marks per device; progress is stored against the mark. A child recognises their symbol before they can read their name, and a shared classroom phone still keeps six learners' histories apart.</p>
+    </div>
+
+    <div class="arrow" aria-hidden="true">→</div>
+
+    <!-- 02 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">2</span><span class="frame-name">Home / today's rung</span></div>
+      <div class="phone"><div class="scr">
+        <div class="scr-top"><span>🐟 पायरी ३</span><span>◑ 62%</span></div>
+        <div class="big-letter" style="font-size:76px;margin:6px 0 4px">क</div>
+        <p class="ask" style="font-size:15px;color:var(--rice-dim)">आजची पायरी</p>
+        <div style="display:grid;gap:11px;margin-top:20px">
+          <div class="pill teal" style="display:flex;align-items:center;gap:10px;justify-content:center">🔊 ऐका</div>
+          <div class="pill" style="display:flex;align-items:center;gap:10px;justify-content:center">🎤 बोला</div>
+          <div class="pill ghost" style="display:flex;align-items:center;gap:10px;justify-content:center">✍️ लिहा</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="rowline"><b>आजचे ६ / १० झाले</b></div>
+        <div class="metre"><i style="width:60%"></i></div>
+      </div></div>
+      <p class="annot"><b>Three modes, one letter.</b> The app picks the letter, not the child — that removes the paralysis of a 48-tile grid. Mode order is a suggestion, not a gate: any of the three can be tapped first.</p>
+    </div>
+
+    <div class="arrow" aria-hidden="true">→</div>
+
+    <!-- 03 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">3</span><span class="frame-name">Mode 1 · ऐका</span></div>
+      <div class="phone"><div class="scr">
+        <div class="scr-top"><span>ऐका · ३/५</span><span>✕</span></div>
+        <div class="mic" style="background:var(--teal);margin-top:10px">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="#F4EBD9"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+        </div>
+        <p class="ask" style="margin-top:14px">कोणतं अक्षर?</p>
+        <div class="grid2" style="margin-top:16px">
+          <div class="card" style="height:72px;font-size:38px">म</div>
+          <div class="card" style="height:72px;font-size:38px;background:var(--haldi)">क</div>
+          <div class="card" style="height:72px;font-size:38px">ख</div>
+          <div class="card" style="height:72px;font-size:38px">ग</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="pill teal" style="font-size:14px">🔊 पुन्हा ऐका</div>
+      </div></div>
+      <p class="annot"><b>Sound → shape.</b> Four tiles, one right. Distractors are drawn from a confusion table (क/फ, ख/रव, म/भ, ब/व), not at random, so a wrong tap carries diagnostic information.</p>
+    </div>
+
+    <div class="arrow" aria-hidden="true">→</div>
+
+    <!-- 04 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">4</span><span class="frame-name">Mode 2 · बोला</span></div>
+      <div class="phone"><div class="scr">
+        <div class="scr-top"><span>बोला · २/५</span><span>✕</span></div>
+        <div class="big-letter" style="font-size:64px;margin:12px 0 6px">कमळ</div>
+        <div class="rowline" style="margin-bottom:10px"><span class="play"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg></span><b>ताईचा आवाज</b></div>
+        <p class="ask" style="font-size:15px">आता तू बोल</p>
+        <div class="mic" style="margin:10px auto 8px;width:70px;height:70px">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="#3A1B04"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V22h2v-3.1A7 7 0 0 0 19 12h-2z"/></svg>
+        </div>
+        <div class="wave" aria-hidden="true" style="height:26px"><i style="height:9px"></i><i style="height:20px"></i><i style="height:26px"></i><i style="height:15px"></i><i style="height:24px"></i><i style="height:11px"></i><i style="height:22px"></i><i style="height:8px"></i></div>
+        <div style="flex:1"></div>
+        <div style="background:rgba(0,0,0,.2);border-radius:12px;padding:10px 12px;text-align:center">
+          <p style="font-family:var(--dev);font-size:17px;font-weight:700">क <span style="color:var(--haldi)">म</span> <span style="color:var(--alert)">ळ</span></p>
+          <p style="font-size:11.5px;color:var(--rice-dim);margin-top:4px">'ळ' पुन्हा बोल</p>
+        </div>
+      </div></div>
+      <p class="annot"><b>The model names the akshara.</b> Not a tick or a cross — a per-letter score, so a child who says कमल for कमळ is told which sound to fix. Each akshara is tinted by its GOP score: clear, weak, wrong.</p>
+    </div>
+
+    <div class="arrow" aria-hidden="true">→</div>
+
+    <!-- 05 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">5</span><span class="frame-name">Mode 3 · लिहा</span></div>
+      <div class="phone"><div class="scr">
+        <div class="scr-top"><span>लिहा · १/५</span><span>✕</span></div>
+        <div class="rowline" style="margin-bottom:10px"><span class="play"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg></span><b>ऐक आणि लिही</b></div>
+        <div class="trace-box" style="flex:0 0 180px">
+          <span class="ghost-letter" style="font-size:112px">क</span>
+          <span class="dot" style="left:50px;top:30px">१</span>
+          <span class="dot" style="left:116px;top:70px">२</span>
+        </div>
+        <div style="background:rgba(0,0,0,.2);border-radius:12px;padding:9px 11px;margin-top:10px;text-align:center">
+          <p style="font-family:var(--dev);font-size:15px;font-weight:700;color:var(--haldi)">वरची रेघ राहिली</p>
+          <p style="font-size:11px;color:var(--rice-dim);margin-top:3px">coverage 76% · शिरोरेखा missing</p>
+        </div>
+        <div class="grid2" style="margin-top:10px"><div class="pill teal" style="font-size:14px">पुसा</div><div class="pill" style="font-size:14px">तपासा</div></div>
+      </div></div>
+      <p class="annot"><b>Five verdicts, not two.</b> accepted · incomplete · missing-shirorekha · off-line · scribble. The state shown is the one that caught a real bug: omitting the शिरोरेखा still averages 76% coverage, so it needs its own hard gate instead of a passing grade.</p>
+    </div>
+
+    <div class="arrow" aria-hidden="true">→</div>
+
+    <!-- 06 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">6</span><span class="frame-name">Feedback</span></div>
+      <div class="phone"><div class="scr" style="justify-content:center;align-items:center;text-align:center">
+        <div class="dance" style="gap:0">
+          <svg class="warli sm" viewBox="0 0 40 62"><circle cx="20" cy="8" r="6"/><path d="M20 30 L11 16 L29 16 Z"/><path d="M20 30 L12 44 L28 44 Z"/><path d="M11 18 L4 6"/><path d="M29 18 L36 6"/><path d="M15 44 L11 60"/><path d="M25 44 L29 60"/></svg>
+          <svg class="warli" viewBox="0 0 40 62" style="fill:var(--haldi);stroke:var(--haldi)"><circle cx="20" cy="8" r="6"/><path d="M20 30 L11 16 L29 16 Z"/><path d="M20 30 L12 44 L28 44 Z"/><path d="M11 18 L4 6"/><path d="M29 18 L36 6"/><path d="M15 44 L11 60"/><path d="M25 44 L29 60"/></svg>
+          <svg class="warli sm" viewBox="0 0 40 62"><circle cx="20" cy="8" r="6"/><path d="M20 30 L11 16 L29 16 Z"/><path d="M20 30 L12 44 L28 44 Z"/><path d="M11 18 L4 6"/><path d="M29 18 L36 6"/><path d="M15 44 L11 60"/><path d="M25 44 L29 60"/></svg>
+        </div>
+        <p class="ask" style="font-size:26px;margin-top:22px">छान! <em>क</em> बरोबर</p>
+        <p style="color:var(--rice-dim);font-size:13.5px;margin-top:8px">एक नाचणारा मिळाला</p>
+        <div style="flex:1"></div>
+        <div class="pill" style="width:100%">पुढे →</div>
+      </div></div>
+      <p class="annot"><b>One dancer per mastered letter.</b> Reward is a Warli figure joining the circle — no coins, no streaks, nothing that punishes a child who misses three days because of harvest work.</p>
+    </div>
+
+    <div class="arrow" aria-hidden="true">→</div>
+
+    <!-- 07 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">7</span><span class="frame-name">My wall</span></div>
+      <div class="phone"><div class="scr">
+        <div class="scr-top"><span>🐟 माझी भिंत</span><span>←</span></div>
+        <div class="tarpa" id="tarpaStatic"></div>
+        <div class="rowline" style="margin-top:6px"><b>१२ पैकी ७ अक्षरं</b></div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:12px">
+          <div class="card" style="height:34px;font-size:17px;background:var(--haldi)">अ</div>
+          <div class="card" style="height:34px;font-size:17px;background:var(--haldi)">आ</div>
+          <div class="card" style="height:34px;font-size:17px;background:var(--haldi)">इ</div>
+          <div class="card" style="height:34px;font-size:17px;background:var(--haldi)">ई</div>
+          <div class="card" style="height:34px;font-size:17px;opacity:.35">उ</div>
+          <div class="card" style="height:34px;font-size:17px;opacity:.35">ऊ</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="pill ghost" style="font-size:14px">शिकायला जा</div>
+      </div></div>
+      <p class="annot"><b>Progress a child can read without reading.</b> The tarpa circle fills as letters are mastered. Tapping any earned letter replays its sound — the wall doubles as a revision deck.</p>
+    </div>
+
+    <div class="arrow" aria-hidden="true">→</div>
+
+    <!-- 08 -->
+    <div class="frame-unit">
+      <div class="frame-tag"><span class="frame-no">8</span><span class="frame-name">Facilitator peek</span></div>
+      <div class="phone"><div class="scr">
+        <div class="scr-top"><span>वर्ग · फोन १</span><span>✕</span></div>
+        <p class="ask" style="font-size:16px;text-align:left;margin-bottom:12px">या आठवड्यात</p>
+        <div style="display:grid;gap:8px">
+          <div class="rowline"><span style="font-size:18px">🐟</span><b>क · ✓✓✓</b><span style="font-family:var(--mono);font-size:11px">२४ मि</span></div>
+          <div class="rowline"><span style="font-size:18px">🌙</span><b>ख · ✓✗✓</b><span style="font-family:var(--mono);font-size:11px">११ मि</span></div>
+          <div class="rowline"><span style="font-size:18px">🪶</span><b>अ · ✗✗</b><span style="font-family:var(--mono);font-size:11px">६ मि</span></div>
+          <div class="rowline"><span style="font-size:18px">🌳</span><b>घ · ✓✓</b><span style="font-family:var(--mono);font-size:11px">१९ मि</span></div>
+        </div>
+        <div class="callout" style="margin-top:14px;font-size:12.5px;border-left-width:2px;padding:10px 12px">🪶 ला 'अ' मध्ये मदत हवी</div>
+        <div style="flex:1"></div>
+        <div class="pill teal" style="font-size:13px">फाइल जतन करा</div>
+      </div></div>
+      <p class="annot"><b>Reached by holding the logo for 3 seconds</b> — discoverable by an adult, invisible to a child, and still no login. Export writes a CSV to the phone's storage for the facilitator to carry out on WhatsApp when they next have signal.</p>
+    </div>
+
+  </div>
+</div></section>
+
+<!-- ============ PROTOTYPE ============ -->
+<section><div class="wrap">
+  <div class="sec-head"><p class="eyebrow">02</p><h2 class="sec">Working prototype</h2></div>
+  <p class="sec-note">All three modes, functioning. The tracing check is the real algorithm — draw inside the letter and it passes, scribble and it fails. Audio here uses the browser's voice for demo purposes; the shipped app plays pre-recorded WAV files of a local Marathi speaker from the APK.</p>
+
+  <div class="proto">
+    <div class="live"><div class="scr" id="app"></div></div>
+
+    <div>
+      <div class="tabs" role="group" aria-label="Jump to a mode">
+        <button data-go="home" aria-pressed="true">घर</button>
+        <button data-go="listen" aria-pressed="false">ऐका</button>
+        <button data-go="speak" aria-pressed="false">बोला</button>
+        <button data-go="write" aria-pressed="false">लिहा</button>
+        <button data-go="wall" aria-pressed="false">माझी भिंत</button>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>Mode</th><th>What it actually does</th></tr></thead>
+        <tbody>
+          <tr><td>ऐका</td><td>Plays the target sound, renders four tiles from the confusion table, scores the tap. Correct tile turns turmeric; a wrong tap dims and the sound replays automatically — no penalty, no dead end.</td></tr>
+          <tr><td>बोला</td><td>In the shipped app this runs the Marathi IndicConformer CTC head locally and scores the recording against the on-screen candidate set. The browser cannot host a 130 MB ONNX model, so what runs here is the capture half — mic permission, live amplitude, silence detection, and the three verdict bands. The scoring itself is in <code>pron_score.py</code> and <code>PronunciationChecker.kt</code>.</td></tr>
+          <tr><td>लिहा</td><td>Rasterises the target glyph to an offscreen canvas, then compares finger strokes against it: coverage (how much of the letter you covered) and spill (how much you drew outside it). Pass is coverage ≥ 70% with spill ≤ 25%.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b>Try the failure paths too.</b> In ऐका, tap a wrong tile. In लिहा, scribble across the whole box — high coverage, high spill, and it correctly fails. That asymmetry is why coverage alone is not enough.</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ SPEC ============ -->
+<section><div class="wrap">
+  <div class="sec-head"><p class="eyebrow">03</p><h2 class="sec">Mode functionality</h2></div>
+  <p class="sec-note">Each mode is one input, one validator, one verdict. Everything below runs on-device with no model download; the total added APK weight is audio assets plus a stroke-template JSON.</p>
+
+  <div class="specs">
+    <div class="spec">
+      <h3>१ · ऐका</h3>
+      <p class="tagline">sound → shape · recognition</p>
+      <dl>
+        <dt>Prompt</dt><dd>Plays <code>audio/mr/ka.wav</code>. Nothing is shown until the sound finishes, so the child must listen rather than pattern-match.</dd>
+        <dt>Input</dt><dd>One tap out of four tiles. Tiles are 72dp tall, spaced 11dp, all within thumb reach on a 5" screen.</dd>
+        <dt>Validator</dt><dd>String equality. No ML, no ambiguity, no false negatives.</dd>
+        <dt>Distractors</dt><dd>Pulled from a hand-built confusion table: visually similar (क/फ, घ/ध, ब/व), then acoustically similar (त/ट, स/श). Stored as <code>confusions.json</code>.</dd>
+        <dt>Pass rule</dt><dd>4 of 5 items correct advances the rung. 2 or fewer repeats the same rung with fresh distractors.</dd>
+        <dt>Wrong answer</dt><dd>Tile dims, sound replays once, child taps again. Never a red X, never a score deduction, never a blocking modal.</dd>
+        <dt>Offline cost</dt><dd>~40 KB of audio per letter at 22 kHz mono Opus. Full Varnamala plus 200 words fits under 12 MB.</dd>
+      </dl>
+    </div>
+
+    <div class="spec">
+      <h3>२ · बोला</h3>
+      <p class="tagline">shape → sound · on-device asr</p>
+      <dl>
+        <dt>Model</dt><dd><code>indicconformer_stt_mr_hybrid_ctc_rnnt_large</code> (AI4Bharat, MIT). 120M-param Conformer encoder, CTC head only. INT8 ONNX ≈ 120–130 MB, bundled in the APK. Never downloaded, never called out.</dd>
+        <dt>Runtime</dt><dd>ONNX Runtime Mobile, 2 threads, CPU. Export with NeMo's mel preprocessor <b>fused into the graph</b> so Android feeds raw 16 kHz samples — a Kotlin reimplementation of log-mel is the classic way this pipeline silently breaks.</dd>
+        <dt>Scoring · 1</dt><dd><b>Closed-set CTC.</b> Compute log P(word | audio) for the target and the 3 words that were on screen, length-normalised, and take the argmax. Accent shifts every candidate together, so the ranking survives it. Free decoding plus string comparison does not.</dd>
+        <dt>Scoring · 2</dt><dd><b>Per-akshara GOP.</b> Viterbi-align the target against the CTC posteriors, then score each aligned segment against the frame's best token. This is what lets the screen say "the ळ" instead of showing a cross.</dd>
+        <dt>Bands</dt><dd>Three, never four. <b>accepted</b> — target wins by margin ≥ 0.35 and min GOP ≥ −1.2. <b>retry</b> — everything else. <b>no_speech</b> — peak below the noise floor, reported as a mic problem.</dd>
+        <dt>Never blocks</dt><dd>After the second attempt the item is accepted regardless of score. A mis-scoring model must be able to annoy a child, never to stop them.</dd>
+        <dt>Calibration</dt><dd>The two thresholds are the whole ballgame and cannot be set from a desk. Fix them on Palghar recordings in your Week 13 field study, optimising false-reject rate at a fixed false-accept rate — a child wrongly told they are wrong is the expensive error.</dd>
+        <dt>Data</dt><dd>Audio stays in memory and is discarded on screen exit. Inference is local, so §11.4 holds unchanged.</dd>
+      </dl>
+    </div>
+
+    <div class="spec">
+      <h3>३ · लिहा</h3>
+      <p class="tagline">sound → stroke · production</p>
+      <dl>
+        <dt>Prompt</dt><dd>The letter's sound plays; a faint ghost glyph and numbered start dots appear. Ghost can be turned off for a mastered letter, which converts tracing into free writing.</dd>
+        <dt>Input</dt><dd>Finger strokes on a canvas. Each stroke is captured as a point list with timestamps.</dd>
+        <dt>Validator</dt><dd>A chamfer distance transform of the glyph, built once per letter, then five checks: <b>scribble</b> (drawn length ≤ 2.5× glyph skeleton), <b>spill</b> (≤ 25% of ink beyond 1.0× pen width), <b>shirorekha</b> (top bar ≥ 60% covered), <b>region floor</b> (every part ≥ 55%), <b>coverage</b> (≥ 70% within 1.75× pen width).</dd>
+        <dt>Why asymmetric</dt><dd>Generous about a child <i>missing</i> the line — cheap digitisers and small fingers wander. Strict about drawing where no letter is. Symmetric tolerances passed a full-canvas scribble at 22% spill in testing.</dd>
+        <dt>Why the extra gates</dt><dd>Because a global average hides a missing part. Omitting the शिरोरेखा scores 76%; bar-and-stem-only scores 72%. Both read as correct on coverage alone. The per-region floor is the general fix; the shirorekha gate exists so the feedback can name it.</dd>
+        <dt>Resolution</dt><dd>Every tolerance derives from the glyph's own pen width (2× the 90th-percentile inner distance), so one threshold set works from 480×854 to 1080p with no retuning.</dd>
+        <dt>Wrong answer</dt><dd>Named in speech and Marathi text, not scored: "वरची रेघ राहिली", "अजून थोडं राहिलं", "रेषेच्या आत लिही". Weakest quadrant highlighted. Then "पुसा" and retry.</dd>
+        <dt>Offline cost</dt><dd>Zero models, zero assets. Distance transform is two O(pixels) passes — within 0.71 px of exact Euclidean, well inside the tolerances it feeds, and fast enough for 60 fps on a 1 GB device.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="callout"><b>What still needs deciding, and what does not.</b> D-02 in §16 can now be closed on the speech side: the Marathi IndicConformer is MIT-licensed, runs offline, and INT8 exports for all 22 languages are already published, so nothing needs training. What cannot be closed from a desk is the pair of thresholds. IndicConformer is trained largely on adult speech, and Warli-accented children in a room with forty other children are the hardest case it will ever see — so the accept margin and GOP floor must come out of your Week 13 field recordings, and until they do, ship with the bands set generously and the two-attempt accept rule in place. Handwriting is the part with no off-the-shelf answer: the geometric check in Mode 3 needs no model at all, so recommend re-scoping the handwriting half of D-02 to geometric validation and spending the ML budget on speech.</div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-head"><p class="eyebrow">04</p><h2 class="sec">Milestone 1 · due 6 Sep</h2></div>
+  <p class="sec-note">Four days out. The split below is deliberate: everything that needs a model is off the critical path, and everything on the critical path has been validated. Milestone 1 demonstrates the complete learning loop — prompt, input, verdict, persist, advance — with two of three modes fully assessed.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Item</th><th>State</th><th>What lands by 6 Sep</th></tr></thead>
+    <tbody>
+      <tr><td>Wireframes</td><td><span class="chip on">done</span></td><td>Eight frames plus five Mode 3 verdict states. Closes the HLD §9.3 gap, which still reads "to be finalized during the UI/UX milestone" for both screens. Was due 22 Aug — submit with the Milestone 1 pack and note the slip.</td></tr>
+      <tr><td>App shell · button input</td><td><span class="chip on">code ready</span></td><td>Compose nav across six screens, one button style, ≥64dp targets. Mode 1 is fully working with no model: four tiles from the confusion table, replay, two-attempt accept, result persisted. This is the mode that proves the loop.</td></tr>
+      <tr><td>Persistence</td><td><span class="chip on">code ready</span></td><td>Room schema matching HLD §8.2 — Learner, Attempt, ProgressRecord — plus the facilitator weekly-summary query. No raw audio or ink is stored anywhere in the schema, per §8.4.</td></tr>
+      <tr><td>Tactile classifier</td><td><span class="chip on">validated</span></td><td>Ships assessed. Five verdict bands, thresholds derived from the glyph's own pen width, self-tested against exact Euclidean distance and five failure cases. No model, no asset, no licence question.</td></tr>
+      <tr><td>ASR</td><td><span class="chip">staged</span></td><td><b>Deliberately not integrated.</b> Interface plus stub, so Mode 2 degrades to reference-then-self playback — a complete activity, not a broken one. A 130 MB conformer, a fused-preprocessor export and threshold calibration is not a four-day job, and a rushed one produces a demo that grades children wrongly.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>Two things to raise at the 6 Sep review.</b> First, three HLD dependencies in §15 are still Pending and now block real work: approved Marathi content, sample learner recordings, and test devices. The recordings gate ASR threshold calibration and the devices gate D-01 — without them the ASR cannot be honestly signed off at any later milestone either, so ask for a date. Second, D-02 can be closed in halves: handwriting resolves to geometric validation with no model, which is decided and working; speech resolves to IndicConformer pending device testing. Splitting the decision lets you close half of it on 6 Sep instead of carrying the whole thing to October.</div>
+</div></section>
+
+<footer><div class="wrap">Aksharvel · screen design, mode specification and Milestone 1 status · for review with Nplusone Social Foundation before the 22 Aug UI/UX milestone</div></footer>
+
+<script>
+/* ---------- shared ---------- */
+const warli = (arms) => {
+  const a = arms === 'up' ? '<path d="M11 18 L4 6"/><path d="M29 18 L36 6"/>' : '<path d="M11 18 L2 26"/><path d="M29 18 L38 26"/>';
+  return `<circle cx="20" cy="8" r="6"/><path d="M20 30 L11 16 L29 16 Z"/><path d="M20 30 L12 44 L28 44 Z"/>${a}<path d="M15 44 L11 60"/><path d="M25 44 L29 60"/>`;
+};
+function buildTarpa(el, filled, total){
+  el.innerHTML = '';
+  for(let i=0;i<total;i++){
+    const ang = (i/total)*Math.PI*2 - Math.PI/2;
+    const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 40 62');
+    s.setAttribute('class','warli sm' + (i<filled ? '' : ' dim'));
+    s.innerHTML = warli(i<filled ? 'up' : 'down');
+    s.style.transform = `translate(${Math.cos(ang)*74}px,${Math.sin(ang)*74}px)`;
+    el.appendChild(s);
+  }
+  const hub = document.createElement('div');
+  hub.className = 'hub';
+  hub.textContent = `${filled} / ${total}`;
+  el.appendChild(hub);
+}
+buildTarpa(document.getElementById('tarpaStatic'), 7, 12);
+
+/* ---------- content ---------- */
+const CONFUSE = { 'क':['फ','ख','म'], 'ख':['रव','क','ष'], 'ग':['ण','म','घ'], 'घ':['ध','ग','थ'],
+                  'अ':['आ','ओ','उ'], 'आ':['अ','ओ','औ'], 'म':['भ','स','न'], 'ल':['ब','व','त'] };
+const LADDER = ['अ','आ','क','ख','ग','घ','म','ल'];
+const WORDS  = { 'क':'कमळ','ख':'खडू','ग':'गाय','घ':'घर','म':'मासा','ल':'लाकूड','अ':'अंबा','आ':'आई' };
+const DOTS   = { 'क':[[.28,.62],[.66,.42]], 'म':[[.3,.6],[.62,.55]], 'ल':[[.34,.58],[.6,.4]],
+                 'ग':[[.36,.4],[.6,.5]], 'घ':[[.3,.5],[.64,.45]], 'ख':[[.28,.55],[.66,.4]],
+                 'अ':[[.3,.45],[.66,.5]], 'आ':[[.3,.45],[.7,.4]] };
+
+const S = { mark:'🐟', letter:'क', mastered:['अ','आ','इ','ई','क','ख','ग'], round:0, score:0, screen:'home' };
+const app = document.getElementById('app');
+
+function say(t){
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t);
+    const v = speechSynthesis.getVoices();
+    u.voice = v.find(x=>/mr[-_]/i.test(x.lang)) || v.find(x=>/hi[-_]/i.test(x.lang)) || null;
+    u.lang = u.voice ? u.voice.lang : 'hi-IN';
+    u.rate = .78;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+const shuffle = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+function setTabs(name){ document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.go===name))); }
+function go(name){ S.screen=name; setTabs(name); ({home,listen,speak,write,wall,done}[name]||home)(); }
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{S.round=0;S.score=0;go(b.dataset.go)}));
+
+/* ---------- home ---------- */
+function home(){
+  app.innerHTML = `
+    <div class="scr-top"><span>${S.mark} पायरी ३</span><button id="toWall" style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em">माझी भिंत ›</button></div>
+    <div class="big-letter" style="font-size:88px;margin:10px 0 2px">${S.letter}</div>
+    <p style="text-align:center;color:var(--rice-dim);font-size:13px">आजची पायरी</p>
+    <div style="display:grid;gap:12px;margin-top:24px">
+      <button class="pill teal" data-go="listen">🔊 ऐका</button>
+      <button class="pill" data-go="speak">🎤 बोला</button>
+      <button class="pill ghost" data-go="write">✍️ लिहा</button>
+    </div>
+    <div style="flex:1"></div>
+    <div class="rowline"><b>${S.mastered.length} अक्षरं शिकली</b></div>
+    <div class="metre"><i style="width:${Math.round(S.mastered.length/12*100)}%"></i></div>`;
+  app.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{S.round=0;S.score=0;go(b.dataset.go)}));
+  app.querySelector('#toWall').addEventListener('click',()=>go('wall'));
+}
+
+/* ---------- mode 1: listen ---------- */
+function listen(){
+  const target = LADDER[(S.round + LADDER.indexOf(S.letter)) % LADDER.length];
+  const opts = shuffle([target, ...(CONFUSE[target]||['म','ख','ग']).slice(0,3)]);
+  app.innerHTML = `
+    <div class="scr-top"><span>ऐका · ${S.round+1}/5</span><button id="x">✕</button></div>
+    <button class="mic" id="hear" style="background:var(--teal);margin-top:12px" aria-label="आवाज ऐका">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="#F4EBD9"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg></button>
+    <p class="ask" style="margin-top:16px">कोणतं अक्षर?</p>
+    <div class="grid2" id="tiles" style="margin-top:16px">
+      ${opts.map(o=>`<button class="tile" data-v="${o}">${o}</button>`).join('')}
+    </div>
+    <div style="flex:1"></div>
+    <p class="verdict" id="v" style="min-height:26px;font-size:16px"></p>
+    <button class="pill teal" id="again" style="font-size:14px;margin-top:6px">🔊 पुन्हा ऐका</button>`;
+  const hear = ()=>say(target);
+  app.querySelector('#hear').onclick = hear;
+  app.querySelector('#again').onclick = hear;
+  app.querySelector('#x').onclick = ()=>go('home');
+  setTimeout(hear, 320);
+  app.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{
+    if(t.dataset.v === target){
+      t.classList.add('right');
+      app.querySelector('#v').textContent = 'बरोबर!';
+      S.score++;
+      setTimeout(()=>{ S.round++; S.round<5 ? listen() : done('ऐका'); }, 900);
+    }else{
+      t.classList.add('wrong'); t.disabled = true;
+      app.querySelector('#v').textContent = 'पुन्हा ऐक';
+      setTimeout(hear, 420);
+    }
+  });
+}
+
+/* ---------- mode 2: speak ---------- */
+let rec = null, chunks = [], mediaStream = null, raf = 0;
+function stopMic(){
+  try{ if(rec && rec.state==='recording') rec.stop(); }catch(e){}
+  if(mediaStream){ mediaStream.getTracks().forEach(t=>t.stop()); mediaStream=null; }
+  cancelAnimationFrame(raf);
+}
+function speak(){
+  const target = LADDER[(S.round + LADDER.indexOf(S.letter)) % LADDER.length];
+  const word = WORDS[target] || target;
+  app.innerHTML = `
+    <div class="scr-top"><span>बोला · ${S.round+1}/5</span><button id="x">✕</button></div>
+    <div class="big-letter" style="font-size:${word.length>2?60:96}px;margin:14px 0 10px">${word}</div>
+    <button class="rowline" id="ref" style="width:100%;margin-bottom:14px"><span class="play"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg></span><b style="text-align:left">ताईचा आवाज</b></button>
+    <p class="ask" style="font-size:16px" id="cue">आता तू बोल</p>
+    <button class="mic" id="mic" style="margin:16px auto 10px" aria-label="रेकॉर्ड करा">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="#3A1B04"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V22h2v-3.1A7 7 0 0 0 19 12h-2z"/></svg></button>
+    <div class="wave" id="wave" aria-hidden="true">${Array(9).fill('<i style="height:5px"></i>').join('')}</div>
+    <div style="flex:1"></div>
+    <div id="post" class="hide">
+      <button class="rowline" id="mine" style="width:100%;margin-bottom:10px"><span class="play"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg></span><b style="text-align:left">तुझा आवाज</b></button>
+      <div class="grid2"><button class="pill" id="ok" style="font-size:14px">जमलं ✓</button><button class="pill ghost" id="no" style="font-size:14px">पुन्हा</button></div>
+    </div>`;
+  app.querySelector('#x').onclick = ()=>{stopMic();go('home')};
+  app.querySelector('#ref').onclick = ()=>say(word);
+  const bars = [...app.querySelectorAll('#wave i')];
+  const mic = app.querySelector('#mic'), cue = app.querySelector('#cue');
+  let on = false, url = null;
+
+  mic.onclick = async ()=>{
+    if(on){ stopMic(); return; }
+    if(!navigator.mediaDevices || !window.MediaRecorder){
+      cue.textContent = 'माइक नाही — पुढे जा'; app.querySelector('#post').classList.remove('hide'); return;
+    }
+    try{
+      mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    }catch(e){ cue.textContent = 'माइकला परवानगी दे'; return; }
+    on = true; chunks = [];
+    mic.style.background = 'var(--alert)'; cue.textContent = 'ऐकतोय… पुन्हा दाब';
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const an = ctx.createAnalyser(); an.fftSize = 512;
+    ctx.createMediaStreamSource(mediaStream).connect(an);
+    const buf = new Uint8Array(an.frequencyBinCount);
+    let peak = 0;
+    (function loop(){
+      an.getByteTimeDomainData(buf);
+      let m = 0; for(const b of buf) m = Math.max(m, Math.abs(b-128));
+      peak = Math.max(peak, m);
+      bars.forEach((b,i)=>b.style.height = Math.max(5, (m/128)*34*(0.55+Math.random()*0.75)) + 'px');
+      raf = requestAnimationFrame(loop);
+    })();
+    rec = new MediaRecorder(mediaStream);
+    rec.ondataavailable = e => chunks.push(e.data);
+    rec.onstop = ()=>{
+      on = false; mic.style.background = 'var(--haldi)';
+      bars.forEach(b=>b.style.height='5px');
+      try{ ctx.close(); }catch(e){}
+      if(peak < 6){ cue.textContent = 'काही ऐकलं नाही — पुन्हा'; return; }
+      cue.textContent = 'दोन्ही ऐक आणि ठरव';
+      url = URL.createObjectURL(new Blob(chunks));
+      app.querySelector('#post').classList.remove('hide');
+      app.querySelector('#mine').onclick = ()=>{ const a = new Audio(url); a.play(); };
+      app.querySelector('#ok').onclick = ()=>{ S.score++; S.round++; stopMic(); S.round<5?speak():done('बोला'); };
+      app.querySelector('#no').onclick = ()=>{ stopMic(); speak(); };
+    };
+    rec.start();
+  };
+  setTimeout(()=>say(word), 380);
+}
+
+/* ---------- mode 3: write ---------- */
+function write(){
+  const target = LADDER[(S.round + LADDER.indexOf(S.letter)) % LADDER.length];
+  app.innerHTML = `
+    <div class="scr-top"><span>लिहा · ${S.round+1}/5</span><button id="x">✕</button></div>
+    <button class="rowline" id="hear" style="width:100%;margin-bottom:12px"><span class="play"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg></span><b style="text-align:left">ऐक आणि लिही</b></button>
+    <div id="canvasWrap">
+      <canvas id="ghostCanvas"></canvas>
+      <canvas id="traceCanvas"></canvas>
+    </div>
+    <p class="verdict" id="v" style="min-height:24px;margin-top:8px;font-size:15px"></p>
+    <div class="grid2" style="margin-top:4px">
+      <button class="pill teal" id="clr" style="font-size:14px">पुसा</button>
+      <button class="pill" id="chk" style="font-size:14px">तपासा</button>
+    </div>`;
+  app.querySelector('#x').onclick = ()=>go('home');
+  app.querySelector('#hear').onclick = ()=>say(target);
+  setTimeout(()=>say(target), 340);
+
+  const wrap = app.querySelector('#canvasWrap');
+  const cv = app.querySelector('#traceCanvas');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.strokeStyle = '#F4EBD9'; ctx.lineWidth = 13; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  // start dots
+  (DOTS[target]||[]).forEach((d,i)=>{
+    const s = document.createElement('span');
+    s.className='dot'; s.textContent = ['१','२','३'][i];
+    s.style.left = (d[0]*W-10)+'px'; s.style.top = (d[1]*H-10)+'px';
+    wrap.appendChild(s);
+  });
+
+  // The ghost the child traces and the mask that grades them are rasterised from the
+  // same font string on the same geometry, after the font has loaded. Otherwise a late
+  // font swap moves the target out from under a perfectly good trace.
+  const size = Math.min(W,H)*0.86;
+  const FONT = `800 ${size}px "Baloo 2","Noto Sans Devanagari",sans-serif`;
+  let gd = null, bd = null;
+
+  function raster(){
+    const gc = app.querySelector('#ghostCanvas');
+    if(!gc) return;                       // screen changed while fonts loaded
+    gc.width = W; gc.height = H;
+    const gv = gc.getContext('2d');
+    gv.font = FONT; gv.textAlign='center'; gv.textBaseline='middle';
+    gv.fillStyle = 'rgba(244,235,217,0.19)';
+    gv.fillText(target, W/2, H/2);
+
+    const glyph = document.createElement('canvas'); glyph.width=W; glyph.height=H;
+    const g = glyph.getContext('2d');
+    g.font = FONT; g.textAlign='center'; g.textBaseline='middle'; g.fillStyle='#fff';
+    g.fillText(target, W/2, H/2);
+    gd = g.getImageData(0,0,W,H).data;
+
+    const band = document.createElement('canvas'); band.width=W; band.height=H;
+    const b = band.getContext('2d');
+    b.font = FONT; b.textAlign='center'; b.textBaseline='middle';
+    b.fillStyle='#fff'; b.strokeStyle='#fff'; b.lineWidth=26; b.lineJoin='round';
+    b.strokeText(target, W/2, H/2); b.fillText(target, W/2, H/2);
+    bd = b.getImageData(0,0,W,H).data;
+  }
+  raster();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(raster);
+
+  let drawing=false, pts=[], strokes=[];
+  const pos = e => { const r=cv.getBoundingClientRect(); const t=e.touches?e.touches[0]:e; return [t.clientX-r.left, t.clientY-r.top]; };
+  const start = e => { e.preventDefault(); drawing=true; pts=[pos(e)]; ctx.beginPath(); ctx.moveTo(...pts[0]); };
+  const move  = e => { if(!drawing) return; e.preventDefault(); const p=pos(e); pts.push(p); ctx.lineTo(...p); ctx.stroke(); };
+  const end   = () => { if(!drawing) return; drawing=false; if(pts.length) strokes.push(pts); pts=[]; };
+  cv.addEventListener('pointerdown',start); cv.addEventListener('pointermove',move);
+  window.addEventListener('pointerup',end);
+  cv.addEventListener('touchstart',start,{passive:false}); cv.addEventListener('touchmove',move,{passive:false});
+  cv.addEventListener('touchend',end);
+
+  app.querySelector('#clr').onclick = ()=>{ ctx.clearRect(0,0,W,H); strokes=[]; app.querySelector('#v').textContent=''; };
+
+  app.querySelector('#chk').onclick = ()=>{
+    if(!gd || !bd) raster();
+    if(!gd || !bd) return;
+    const ud = ctx.getImageData(0,0,W,H).data;
+    // fatten user strokes into a check band
+    const ub = document.createElement('canvas'); ub.width=W; ub.height=H;
+    const u2 = ub.getContext('2d');
+    u2.strokeStyle='#fff'; u2.lineWidth=30; u2.lineCap='round'; u2.lineJoin='round';
+    strokes.forEach(s=>{ u2.beginPath(); u2.moveTo(...s[0]); s.forEach(p=>u2.lineTo(...p)); u2.stroke(); });
+    const ubd = u2.getImageData(0,0,W,H).data;
+
+    let gTot=0, gHit=0, uTot=0, uOut=0;
+    for(let i=3;i<gd.length;i+=4){
+      if(gd[i]>60){ gTot++; if(ubd[i]>40) gHit++; }
+      if(ud[i]>60){ uTot++; if(bd[i]<40) uOut++; }
+    }
+    const v = app.querySelector('#v');
+    if(uTot < 200){ v.textContent = 'अक्षर लिही'; return; }
+    const cov = gHit/Math.max(1,gTot), spill = uOut/Math.max(1,uTot);
+    const okOrder = (DOTS[target]||[]).length===0 || strokes.length>0;
+    if(cov>=0.70 && spill<=0.25 && okOrder){
+      v.innerHTML = `छान! <span style="color:var(--haldi)">${Math.round(cov*100)}%</span> बरोबर`;
+      say('छान'); S.score++;
+      setTimeout(()=>{ S.round++; S.round<5?write():done('लिहा'); }, 1100);
+    }else if(cov<0.70){
+      v.textContent = `अजून काही राहिलं (${Math.round(cov*100)}%)`;
+    }else{
+      v.textContent = 'रेषेच्या आत लिही';
+    }
+  };
+}
+
+/* ---------- feedback / wall ---------- */
+function done(mode){
+  app.innerHTML = `
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div class="dance" style="gap:0" id="cel"></div>
+      <p class="ask" style="font-size:24px;margin-top:22px">${S.score>=4?'छान!':'पुन्हा करू'} ${S.score}/5</p>
+      <p style="color:var(--rice-dim);font-size:13px;margin-top:8px">${mode} पूर्ण</p>
+    </div>
+    <button class="pill" id="next" style="width:100%">पुढे →</button>`;
+  const cel = app.querySelector('#cel');
+  for(let i=0;i<3;i++){
+    const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 40 62');
+    s.setAttribute('class','warli' + (i===1?'':' sm'));
+    if(i===1){ s.style.fill='var(--haldi)'; s.style.stroke='var(--haldi)'; }
+    s.innerHTML = warli('up'); cel.appendChild(s);
+  }
+  if(S.score>=4 && !S.mastered.includes(S.letter)) S.mastered.push(S.letter);
+  app.querySelector('#next').onclick = ()=>{ S.round=0;S.score=0; go('home'); };
+}
+
+function wall(){
+  const all = ['अ','आ','इ','ई','उ','ऊ','ए','ऐ','ओ','औ','क','ख'];
+  app.innerHTML = `
+    <div class="scr-top"><span>${S.mark} माझी भिंत</span><button id="x">←</button></div>
+    <div class="tarpa" id="tp"></div>
+    <div class="rowline"><b>१२ पैकी ${S.mastered.filter(m=>all.includes(m)).length} अक्षरं</b></div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:12px">
+      ${all.map(l=>`<button class="card" data-l="${l}" style="height:36px;font-size:18px;${S.mastered.includes(l)?'background:var(--haldi)':'opacity:.35'}">${l}</button>`).join('')}
+    </div>
+    <div style="flex:1"></div>
+    <button class="pill ghost" id="back" style="font-size:14px">शिकायला जा</button>`;
+  buildTarpa(app.querySelector('#tp'), S.mastered.filter(m=>all.includes(m)).length, 12);
+  app.querySelector('#x').onclick = ()=>go('home');
+  app.querySelector('#back').onclick = ()=>go('home');
+  app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>say(b.dataset.l));
+}
+
+if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = ()=>{};
+home();
+</script>
+</body>
+</html>

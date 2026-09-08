@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Aksharvel colour tokens — Speaking Mode phoneme chips.
+  Merge into res/values/colors.xml (or keep as a separate file and include it).
+
+  Palette rationale (from MoM wireframe review):
+    - Green (#4CAF50) is the "correct" signal used on the tracing screen too
+      (Maitreyee's StrokeClassifier feedback). Reusing the same green means a child
+      who has used Writing Mode already knows what green means in Speaking Mode.
+    - Amber (#FFA726) is distinct from both green and the grey neutral under all
+      common forms of colour-vision deficiency (deuteranopia, protanopia). It was
+      checked with a simulator at 480p screen luminance.
+    - The text colour (#212121) passes WCAG AA against all chip backgrounds.
+    - The focus-border colour (#E65100) is the deep-amber that Android Material 3
+      uses for "error" states; reusing it avoids introducing a fifth hue.
+-->
+<resources>
+    <!-- Chip backgrounds -->
+    <color name="aksharvel_chip_pending">#BDBDBD</color>   <!-- mid-grey    -->
+    <color name="aksharvel_chip_correct">#4CAF50</color>   <!-- green       -->
+    <color name="aksharvel_chip_weak">#FFA726</color>      <!-- amber       -->
+    <color name="aksharvel_chip_unscored">#E0E0E0</color>  <!-- light grey  -->
+
+    <!-- Text inside chips -->
+    <color name="aksharvel_chip_text">#212121</color>      <!-- near-black  -->
+
+    <!-- Animated border on the FOCUS chip -->
+    <color name="aksharvel_chip_focus_border">#E65100</color>  <!-- deep amber -->
+</resources>
